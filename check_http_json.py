@@ -107,17 +107,39 @@ def getResultURL(url):
 # Vérifie le retour JSON
 ##
 def checkResult(result):
-    if result['code'] == 0:
-        print "OK: %s" % (result['msg'])
-        sys.exit(0)
-    elif result['code'] == 1:
-        print "WARNING: %s" % (result['msg'])
-        sys.exit(1)
-    elif result['code'] == 2:
-        print "CRITICAL: %s" % (result['msg'])
-        sys.exit(2)
+    if 'msg' in result:
+        msg = result['msg']
     else:
-        print "UNKNOW: %s" % (result['msg'])
+        msg = "Pas de message de retour"
+
+    if 'code' in result:
+
+        if result['code'] == 0:
+            print "OK: %s" % (msg)
+            if 'extra' in result:
+                print result['extra']
+            sys.exit(0)
+
+        elif result['code'] == 1:
+            print "WARNING: %s" % (msg)
+            if 'extra' in result:
+                print result['extra']
+            sys.exit(1)
+
+        elif result['code'] == 2:
+            print "CRITICAL: %s" % (msg)
+            if 'extra' in result:
+                print result['extra']
+            sys.exit(2)
+
+        else:
+            print "UNKNOW: %s" % (msg)
+            if 'extra' in result:
+                print result['extra']
+            sys.exit(3)
+
+    else:
+        print "UNKNOW: Pas de code retour reçu par l'application"
         sys.exit(3)
 
 
@@ -126,6 +148,9 @@ def checkResult(result):
 ##
 def main():
     parseOptions()
+    if hostname == '':
+        usage()
+        sys.exit(3)
     #print "hostname=%s" % (hostname)
     #print "uri=%s" % (uri)
     url = generateURL(hostname, uri, port, ssl)
