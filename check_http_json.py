@@ -14,6 +14,7 @@ hostname = ""
 uri = "/"
 port = 80
 ssl = False
+verbose = False
 
 
 ###
@@ -25,6 +26,7 @@ def usage():
     print " -p, --port=INTEGER  : Numéro du port (défaut: 80)"
     print " -i, --uri=URI       : URL pour le GET (défaut: /)"
     print " -S, --ssl           : Connection via SSL (port par défaut 443)"
+    print " -v, --verbose       : Mode verbeux"
     print " -h, --help          : Affiche cet écran"
     print ""
 
@@ -34,7 +36,7 @@ def usage():
 ##
 def parseOptions():
     try:
-        opts, args = getopt.getopt(sys.argv[1:], "hH:i:p:S", ["help", "hostname=", "uri=", "port=", "ssl"])
+        opts, args = getopt.getopt(sys.argv[1:], "hH:i:p:Sv", ["help", "hostname=", "uri=", "port=", "ssl", "verbose"])
     except getopt.GetoptError:
         usage()
         sys.exit(3)
@@ -59,6 +61,9 @@ def parseOptions():
         elif opt in ("-S", "--ssl"):
             global ssl
             ssl = True
+        elif opt in ("-v", "--verbose"):
+            global verbose
+            verbose = True
 
 
 ###
@@ -151,12 +156,24 @@ def main():
     if hostname == '':
         usage()
         sys.exit(3)
-    #print "hostname=%s" % (hostname)
-    #print "uri=%s" % (uri)
+    if verbose == True:
+        print "hostname=%s" % (hostname)
+        print "uri=%s" % (uri)
+        print "port=%s" % (port)
+        if ssl == True:
+            print "ssl=oui"
+
+    if verbose == True:
+        print "Génération de l'URL"
     url = generateURL(hostname, uri, port, ssl)
-    #print url
+    if verbose == True:
+        print "URL=%s" % (url)
+
+    if verbose == True:
+        print "Décodage de retour JSON"
     resjson = getResultURL(url)
-    #print resjson
+    if verbose == True:
+        print resjson
     checkResult(resjson)
 
 
